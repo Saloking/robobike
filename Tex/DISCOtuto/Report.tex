@@ -1,0 +1,314 @@
+\documentclass[a4paper]{article}
+
+%%%%%%%%%%%%%%% packages %%%%%%%%%%%%%%%%%%%%
+\usepackage[USenglish]{babel}
+\usepackage{cite}
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{amsthm}
+%\usepackage{bbm} %for blackbord bold numbers
+\usepackage{hyperref}
+
+
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{plotmarks,shapes,arrows,shadows}
+\usepgfplotslibrary{external}           % to precompile tikz
+\pgfplotsset{compat=newest}
+\tikzexternalize[prefix=Images/tikzPrecompiled/]  % to precompile tikz
+\usepackage[utf8x]{inputenc}
+\tikzset{font=\tiny}
+\pgfplotsset{title style={font=\tiny}}
+
+\usepackage{graphicx}
+\graphicspath{{elements/}} % Pfad, an dem die Bilder gespeichert sind
+\usepackage{subfig}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\pagestyle{fancy}
+%\fancyhead[LE,RO]{ text } % use this for left right swapping for odd/even pages
+\rhead{\rightHead}
+\lhead{\leftHead}
+\rfoot{\rightFood}
+\lfoot{\leftFood}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0.5pt}
+
+%%%%%%%%%%%%%%% environments %%%%%%%%%%%%%%%%%%%%
+\newtheorem{thm}{Theorem}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ass}[thm]{Assumption}
+\newtheorem{ex}[thm]{Example}
+\newtheorem{rem}[thm]{Remark}
+
+
+%%%%%%%%%%%%%%% defines %%%%%%%%%%%%%%%%%%%%
+% command redefinitions for \mathbb R, etc
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\PE}{\mathbb{E}}
+\newcommand{\X}{\mathbb{X}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\U}{\mathbb{U}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\W}{\mathbb{W}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\AB}{\mathbb{A\hspace{-0.5ex}B}}
+
+
+%%%%%%%%%%%%%%% article specs %%%%%%%%%%%%%%%%%%%%
+\def\rightHead{\maintitle}
+\def\leftHead{}
+\def\rightFood{\thepage}
+\def\leftFood{}
+\def\maintitle{Getting started with STM32F746G-DISCO x BNO055 in Matlab and Simulink}
+\def\subtitle{}
+\title{\bf \maintitle\\
+  \vspace{1cm}
+  {\large
+    \subtitle%
+  }
+}
+
+\author{Nikolas Schroeder\\
+  Institute for Systems Theory and Automatic Control\\
+  \texttt{lrt86824@stud.uni-stuttgart.de}%
+}
+
+\date{\today}
+
+%%%%%%%%%%%%%%% main document %%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\hrulefill
+\begin{abstract}
+This paper gives an overview on how to implement code and sensor interfaces on the STM32F746G Discovery Board using Matlab Embedded Coder and the proper hardware support package. After a short installation and setup guide it is shown how to interface an inertial measurement unit via I2C with the STM-Discovery and monitor the results in Simulink External Mode.
+
+\bigskip
+
+Background: The BNO055 IMU was selected for the IST Self-Driving Bicycle project in order to estimate a measure for the current roll angle $ \phi $ and the corresponding angular rate $ \dot \phi $. 
+\end{abstract}
+
+\hrulefill
+%\noindent\rule{\textwidth}{1pt}
+
+\pagebreak
+
+\section{Installation and Setup}
+
+In general the installation and setup of the tool chain were pretty straight forward. There are many good tutorials on mathworks.com which explain each necessary step in detail. However, a few minor problems occurred which made the whole process quite time consuming. Therefore, this section includes some hints to accelerate installation and setup. In the following it is recommended to read along the tutorial \href{https://de.mathworks.com/help/supportpkg/stmicroelectronicsstm32f4discovery/examples/getting-started-with-embedded-coder-support-package-for-stmicroelectronics-stm32-discovery-boards.html}{"Getting started with Embedded Coder support package for STMicroelectronics Discovery Boards"}.
+
+\subsection{Matlab and Simulink}
+
+Under version R2016b, Matlab was not able to detect the Discovery board. After updating to version R2017a this problem didn't occur anymore. Of course, this problem may originated from something different than the version but nevertheless, it is recommended to work with the most recent one. In order to automatically generate code for embedded systems out of Matlab files and Simulink models make sure that the following toolboxes are installed:
+
+\begin{itemize}
+\item Matlab Coder
+\item Simulink Coder
+\item Embedded Coder
+\end{itemize}
+
+\subsection{Hardware Support Package}
+For the STM Discovery boards STM32F4 and STMF32F746G, a hardware support package, which comes along with custom Simulink blocks, is provided by Mathworks. In order to work with the \href{https://de.mathworks.com/matlabcentral/fileexchange/43093-embedded-coder-support-package-for-stmicroelectronics-discovery-boards}{"Embedded Coder Support Package for STM Discovery Boards"} an additional support package called \href{https://de.mathworks.com/matlabcentral/fileexchange/43095-embedded-coder-support-package-for-arm-cortex-m-processors}{"Embedded Coder Support Package for ARM Cortex-M Processors"} needs to be installed as well. The most convenient way to install the packages is to navigate to the Matlab Add-On explorer, browse for them and then use the auto install function.
+
+\bigskip Moreover the \href{http://www.st.com/en/embedded-software/stsw-stm32068.html}{STM32F4 Discovery Board Firmware}, which can be downloaded directly from STM, is required. During the setup of the hardware support package for the Discovery boards  you'll be asked to provide the installation path of the firmware. In case any errors occur (also later on in code deployment when the package is already installed) the following steps can be checked for troubleshooting:
+
+\begin{itemize}
+
+\item Navigate to the board support package setup wizard and assure that the right installation path for the Discovery board firmware is included.
+
+Add-On Explorer $\rightarrow$ Manage Add-Ons $\rightarrow$ browse for board support package and click on Setup
+
+
+
+\item Check if the package installation path 
+
+\textbackslash ProgramData\textbackslash MATLAB\textbackslash SupportPackages\textbackslash R2017a\textbackslash 3P.instrset 
+
+has the 2 following folders "cmsis.instrset" and "gnuarm-armcortex.instrset".
+
+\item In case not, unpack the files from the two folders
+"gnuarm-armcortex. instrset\textunderscore win64\textunderscore xxxx" and "cmsis.instrset\textunderscore common\textunderscore xxxx" from the package installation files
+
+\textbackslash Downloads\textbackslash MathWorks\textbackslash SupportPackages\textbackslash R2017a\textbackslash archives\textbackslash 3p
+
+(path may differ) and move them to the matching folders from the path mentioned in the bullet point above. Since the folders weren't existing they need to be created.
+
+\item In case those zipped files don't exist in the  installation files either, uninstall the board support package, manually download the installation files, check the folders and then re-install the package.   
+
+\end{itemize}
+ 
+
+\section{Hardware Setup} \label{hardware}
+
+The following table shows the pin-out between the STM-Discovery and the BNO055-Shuttleboard.
+
+ 
+   \begin{center}        
+    \begin{tabular}{ | l | l | l | p{5cm} |}
+    \hline
+    BNO055 & STM32F746G-DISCO \\ \hline
+    VVD (1) & 3V3 \\ \hline
+    VVDIO (2) & 3V3 \\ \hline
+    GND (3) & GND \\ \hline
+    PS0 (8) & GND \\ \hline
+    PS1 (9) & GND \\ \hline
+    I2C\_MODE\_ADR\_SEL (22) & GND \\ \hline
+    SCL (18) & D15 \\ \hline
+    SCK (17) & D14 \\ \hline
+    \end{tabular}
+    \end{center}
+      
+\begin{figure}[htb]
+	\centering
+	\includegraphics*[trim=0mm 0mm 0mm 0mm,width=0.85\textwidth]{shuttlepins}
+	\caption{Pin nomenclature of the BNO055-Shuttleboard ~\cite{shuttle1}}
+	\label{shuttleboard}
+%	\fgr{shuttlepins}
+\end{figure}
+
+The STM-Discovery itself is powered and also programmed via a mini USB which is connected to the Laptop which runs the Matlab/Simulink environment.
+
+\subsection{BNO055 9-axis absolute Orientation Sensor}
+\label{eyetosee}
+The Bosch BNO055 is composed of an accelerometer, a gyroscope and a magnetometer. All three of them offer three degrees of freedom, which is why the device is called a "9-axis absolute Orientation Sensor". The BNO055 comes along with an on-chip microcontroller which purpose it is to run fusion algorithms at output rates up to 100 Hz. Since those fusion algorithms promise more accurate orientation data and reduce the development time, the BNO055 was chosen for the self-driving bicycle project. However, it is not decided yet if the sensor will be used in fusion mode or if the raw sensor data will be fused as part of the control algorithm which runs on the STM-Discovery. This decision is subject to future tests and validation processes.     
+
+\bigskip
+ 
+Figure \ref{shuttleboard} shows the pin nomenclature of the BNO055-Shuttleboard. The sensor was purchased in this option because it offers the development of prototypes in a fast manner and the time-consuming design and manufacturing of a PCB can be skipped. In order to power the three sensors and the microcontroller of the BNO055, the VDD/VDDIO pins need to be hooked up to 3V3 and the GND pin to ground. 
+
+
+The digital interface that was chosen to enable the communication between the BNO055 and the STM-Discovery is the I2C-protocol at which the STM-Discovery represents master and the BNO055 slave. Therefor, the PS0 and PS1 pins need to be connected to ground and the SDA/SCL pins to the according STM-Discovery SDA/SCL lines. In this case, pin 22 is connected to ground which means that the I2C slave-address is 0x28. For more information on the pin-out and the I2C-protocol, it is referred to~\cite{BNO1}.      
+
+
+\section{The Data Acquire Simulink Model}
+
+The main purpose of the data acquire process is to read out the BNO055 raw sensor data and convert it into SI-units. This section explains in detail how this process is realized in Simulink and how the model needs to be modified in order to change the sensor configuration. Furthermore it is shown how the model is deployed to the STM-Discovery and how it can be run in External Mode. 
+
+\bigskip
+
+Before we have a closer look at the models subsystems and their functions it needs to be ensured that the models settings are correct and also that the model runs on the STM-Discovery. Open the "DataAcquire.slx" file, navigate to the Model Configuration Parameters dialogue box and check if the hardware implementation settings are as shown in Figure \ref{configparams}. Make sure to adjust the COM port for the serial communication.  
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics*[trim=0mm 0mm 0mm 0mm,width=0.9\textwidth]{configparameters}
+	\caption{Configuration Parameters}
+	\label{configparams}
+\end{figure}
+
+
+\subsection{Running the Model on the STM-Discovery} 
+
+There are two options to deploy the model to the STM-Discovery. The first option is to run the code which was generated from the model without having the STM-Discovery giving back any data or information to the Simulink environment. That option will mainly be used when the model and its belonging C/C++ Code is fully developed and validated.
+
+\bigskip
+
+The second option is to run the model in External Mode. In this mode the STM-Discovery and the Simulink Environment can communicate via a serial connection. This comes in handy during development and validation because it is possible to monitor and manipulate certain register values of the BNO055, including the sensor data itself, while the model is running on the STM-Disovery. That is the reason why the "DataAcquire.slx" file has many display blocks in its subsystems. Through those displays it is easy to comprehend if the generated code shows the expected behavior. Moreover the External Mode is used to conduct first system tests.
+
+\begin{figure}[htb]
+\centering
+	{\includegraphics*[trim=0mm 0mm 0mm 0mm,width=0.9\textwidth]{externalmode}}
+	\caption{External Mode Setting }
+	\label{external}
+\end{figure}
+
+To run the model in External Mode make sure that "External" is selected as shown in Figure \ref{external} and that the hardware is wired up as described in section \ref{hardware}. Push the "Run" button to start the execution. The model will be built, compiled and then programmed onto the STM-Discovery. Before the model is deployed to the hardware in external mode it needs to be saved. Otherwise, the most recent copy will be used and the unsaved changes are ignored.
+
+\subsection{I2C Read and Write blocks}
+
+The essence of the data acquire model is to interface the BNO055 and the STM-Discovery via I2C. Fortunately, the hardware support package for the STM-Discovery comes along with I2C write and read blocks which make it fairly easy to set up the interface. Figure \ref{i2cdia} shows the block settings for reading out the calibration register. The two most important panels are "Slave address" and "Slave register address". The BNO055 slave address is always 0x28 (see section \ref{eyetosee}). The register address is nothing different than the registers offset from the slave address. A list of all registers, their addresses and their functions can be found in the BNO055 datasheet~\cite{BNO1}. The sample time determines how frequent the read operation is triggered.     
+
+\begin{figure}[htb]
+\centering
+	{\includegraphics*[trim=0mm 0mm 0mm 0mm,width=0.4\textwidth]{i2cdia}}
+	\caption{External Mode Setting }
+	\label{i2cdia}
+\end{figure}
+
+Figure \ref{i2cread} shows the blocks appearance in the Simulink environment. It has two output ports. One outputting the data in the format specified in the settings (here: uint8) and one indicating if the operation was successful. The appearance and settings of an I2C write block are exactly the same except that it has a data input port.
+
+\begin{figure}[htb]
+\centering
+	{\includegraphics*[trim=0mm 0mm 0mm 0mm,width=0.7\textwidth]{i2cread}}
+	\caption{External Mode Setting }
+	\label{i2cread}
+\end{figure}
+
+
+
+
+\subsection{Status Read Outs}
+\begin{itemize}
+\item Chip-ID
+\item Self-Test Result
+\item Calibration Status
+\item System Status
+\item System Error
+\end{itemize}
+
+\subsection{Configuration}
+\begin{itemize}
+\item Operation Mode
+\item Unit Selection
+\item Axis Remap
+\item Axis Map Signs
+\end{itemize}
+
+\subsection{Calibration}
+...TBD... see section \ref{todo}
+
+\subsection{Data Read Out}
+\begin{itemize}
+\item Euler Read Out
+\item ACC Read Out
+\item GYRO Read Out
+\end{itemize}
+
+\subsubsection{Parser Subsystem}
+
+\begin{itemize}
+\item Bitwise Operation
+\item Data Type Conversion
+\item Scaling
+\end{itemize}
+
+
+
+\section{TODO} \label{todo}
+
+ Status: August 14th 2017
+ 
+ \begin{itemize}
+\item Calibration Subsystem: Enable re-using calibration profiles. Read from and writing to offset and radius registers. How does the calibration status register behave when something is written to the offset and radius registers while in config mode? Do those values change again after changing to a fusion mode?  
+
+\item In \cite{BNO1} it is stated that write operations are forbidden when the operation mode is any other than CONFIGMODE. ATM all I2C write operations (those are limited to the configuration subsystem so far) are executed in an infinite loop. For example, after changing to a fusion mode it is still written to the unit selection register. This results in a system error with error code 6 (register map write error). In order to avoid this it is necessary to change the model in a way that assures that registers can only be written to when the operation mode is CONFIGMODE.
+  
+\item Data Logging via "Scope" or "To Workspace" Block 
+
+\item What exactly means "Sample time" in the I2C write/read block settings. What's the unit, what does its value refer to?
+
+\item Test if the ACC and GYRO data registers hold different values when (a) in fusion mode or (b) in none fusion mode. Info should also be in BNO055 datasheet. 
+
+
+\end{itemize}
+ 
+
+% Literaturverzeichnis
+
+\bibliographystyle{plain}
+
+\clearpage
+
+%\phantomsection
+
+%\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+\bibliography{bibABC}
+
+\end{document}
+

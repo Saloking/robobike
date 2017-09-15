@@ -1,0 +1,45 @@
+Pendulum-Test; Author: Nikolas Schroeder, Date: Sep 11th 2017
+
+The pendulum test will be conducted in order to determine the accuracy of the BNO055 absolute orientation sensor. Therefor, the BNO055 gets attached to the pendulum which is actuated and controlled via an external workstation.
+
+The pendulum itself has a built-in encoder which feeds back the current angle. Since the encoder is highly accurate it is possible to compare the BNO055 data with the encoder data and draw conclusions about the BNO055s accuracy. To do that it is obviously neccessary to log both datasets. The encoder data can be logged into a MAT-file via dSPACE. The BNO055 can be run in external mode with the "DataAcquire.slx" model.
+
+Logging in external mode:
+
+- Navigate to Code -> External Mode Control Panel
+- Data Archiving -> Enable Data Archiving, set directory, set name, select increment after one-shot...
+- Signal & Triggering -> Set Trigger Options (Source: manual; Mode: one-shot; Duration: atm it is 1000, can be defined differently; Delay: 0)
+-Select "Arm when connecting to target"
+- Navigate to the top-system block-design of the "DataAcquire.slx" and in each scope (EUL/ACC/GYRO) go to properties/logging and enable logging data to workspace (also set a variable name).
+
+While the model is running:
+
+Since "Arm when connecting to target" was selected, the first one-shot will be saved to a file right away when the target is connected. After this first one-shot you'll notice that the displayed sensor values are frozen.That's because we configured the external-mode to operate in one-shot mode. That means after the duration of the one-shot there's no more data sent via the serial link between your simulink environment and the STM-Discovery board (target). Keep in mind that the STM-Discovery and the BNO055 are still powered on and programmed which means that the sensor is still running (just sending data to the STM-Discovery via I2C).
+
+To execute the next one-shot open the External Mode Control Panel and press Arm trigger. This results in the next logged file containing the most recent one-shot with the EUL/ACC/GYRO data. Over the duration of the one-shot you'll notice that the displays are not frozen anymore.
+
+Sidenote: During the one-shot I noticed that the displays are really slow. 
+
+Test-Strategy: 
+
+1. Option:
+- Run the model and as soon as it gets connected to the target start moving around the BNO055 in order to get the ACC and GYRO calibrated. That might take 2 or 3 one-shots. Check Status read outs -> Calibration Status to see if the calibration was successful.
+- As soon as the sensor is calibrated attach it to the pendulum (do not power off the device, otherwise the calibration gets lost)
+- Now trigger the next one-shot synchronously with the pendulum. Basically it needs to be assured that the two datasets are synchronous.
+
+2. Option:
+- Reuse a Calibration profile. That makes it more convenient to attach the Sensor to the pendulum because it doesn't need to be powered on.
+- The reuse of a calibration profile is not provided yet in the "DataAcquire.slx" model.
+
+
+
+TODO:
+
+-reduce sample time of the i2c blocks
+
+
+Problems that occured while Testing.
+
+I2C block read out frequency: 10 Hz work prefectly fine. If you raise the frequency though, let's say to 80 Hz or 100 Hz, the external mode gets extremely slow (at least it appears extremely slow). For a one-shot duration of 1000 cycles we get 1000 measurements at a frequency of 80 Hz. Therefor, we assume that we measured a total time period of 12.5 s. Compared to the dSpace measurement we'd accept about more or less 5 swinging-periods of the pendulum for those 12.5 s. What we see unfortunately, is a big deviation in the BNO055 measurement. We count more then those 4 or 5 periods (have a look at the data-set "pendulum_BNO055_0915_Data2_Eingependelt_80Hz"). 
+
+

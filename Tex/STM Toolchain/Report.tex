@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+
+%%%%%%%%%%%%%%% packages %%%%%%%%%%%%%%%%%%%%
+\usepackage[USenglish]{babel}
+\usepackage{cite}
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{amsthm}
+%\usepackage{bbm} %for blackbord bold numbers
+
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{plotmarks,shapes,arrows,shadows}
+\usepgfplotslibrary{external}           % to precompile tikz
+\pgfplotsset{compat=newest}
+\tikzexternalize[prefix=Images/tikzPrecompiled/]  % to precompile tikz
+\usepackage[utf8x]{inputenc}
+\tikzset{font=\tiny}
+\pgfplotsset{title style={font=\tiny}}
+
+\usepackage{graphicx}
+\usepackage{subfig}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\pagestyle{fancy}
+%\fancyhead[LE,RO]{ text } % use this for left right swapping for odd/even pages
+\rhead{\rightHead}
+\lhead{\leftHead}
+\rfoot{\rightFood}
+\lfoot{\leftFood}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0.5pt}
+
+%%%%%%%%%%%%%%% environments %%%%%%%%%%%%%%%%%%%%
+\newtheorem{thm}{Theorem}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ass}[thm]{Assumption}
+\newtheorem{ex}[thm]{Example}
+\newtheorem{rem}[thm]{Remark}
+
+
+%%%%%%%%%%%%%%% defines %%%%%%%%%%%%%%%%%%%%
+% command redefinitions for \mathbb R, etc
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\PE}{\mathbb{E}}
+\newcommand{\X}{\mathbb{X}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\U}{\mathbb{U}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\W}{\mathbb{W}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\AB}{\mathbb{A\hspace{-0.5ex}B}}
+
+
+%%%%%%%%%%%%%%% article specs %%%%%%%%%%%%%%%%%%%%
+\def\rightHead{\maintitle}
+\def\leftHead{}
+\def\rightFood{\thepage}
+\def\leftFood{}
+\def\maintitle{Programming the STM32F746G-Discovery Board}
+\def\subtitle{}
+\title{\bf \maintitle\\
+  \vspace{1cm}
+  {\large
+    \subtitle%
+  }
+}
+
+\author{Nikolas Schroeder\\
+  Institute for Systems Theory and Automatic Control\\
+  \texttt{lrt86824@stud.uni-stuttgart.de}%
+}
+
+\date{\today}
+
+%%%%%%%%%%%%%%% main document %%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\hrulefill
+\begin{abstract}
+This paper gives an overview on how to program the STM-Discovery board with STM32Cube, Eclipse and a GNU Compiler. Also it deals with the inclusion of C/C++ code which was generated from Simulink models such as the DataAcquire.slx model. 
+\end{abstract}
+
+\hrulefill
+%\noindent\rule{\textwidth}{1pt}
+
+\pagebreak
+
+\section{Requirements}
+
+\begin{itemize}
+\item Eclipse IDE
+\item GNU ARM Eclipse Plug-In
+\item GCC ARM tool-chain
+\item STM32CubeMx
+\end{itemize}
+ 
+
+%%fakesection
+{\small
+\bibliographystyle{IEEEtranNoUrl}
+\bibliography{GlobalBib}
+}
+
+
+\section{Options}
+
+kkkkkkkk
+\subsection{Sensodrive}
+
+\subsection{Maxon}
+
+\subsection{Robodrive}
+
+jjjjjjj
+
+%%fakesection
+{\small
+\bibliographystyle{IEEEtranNoUrl}
+\bibliography{GlobalBib}
+}
+
+
+\section{Conclusion}
+
+%%fakesection
+{\small
+\bibliographystyle{IEEEtranNoUrl}
+\bibliography{GlobalBib}
+}
+\end{document}
+

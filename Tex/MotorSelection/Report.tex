@@ -7,6 +7,8 @@
 \usepackage{amssymb}  % assumes amsmath package installed
 \usepackage{amsthm}
 %\usepackage{bbm} %for blackbord bold numbers
+\usepackage{eurosym}
+
 
 \usepackage{tikz,pgfplots}
 \usetikzlibrary{plotmarks,shapes,arrows,shadows}
@@ -94,7 +96,15 @@ This report gives a short overview of the different drives and motor controllers
 
 \section{Requirements}
 
-The drive for the steering mechnanism needs to provide a minimal continuous torque of 15 to 20 Nm at a speed of at least 33 rpm. The supply voltage can be either 24 or 48 V. The backlash of the gearhead should be as low as possible. Since there will be an iteration of the bicycle design after the drive was selected, there were no specific requirements regarding the dimensions and weight. In general the optimal solution is as small and also as light as possible.  
+The drive for the steering mechnanism needs to provide a minimal continuous torque of 7 to 8 Nm and reoccurring peak-torques of up to 15 Nm. It is desired that all torques can be driven at a speed of at least 60 rpm. The supply voltage can be either 24 or 48 V. The backlash of the gearhead should be as low as possible. Since there will be an iteration of the bicycle design after the drive was selected, there were no specific requirements regarding the dimensions and weight. In general, the optimal solution is as small and also as light as possible. 
+
+\bigskip
+
+Those requirements are as recent as Sept. 2017. Since the they differ from the original requirements, some of the options presented in the following are not really fitting the current requirements. 
+
+\bigskip
+
+
 
 %%fakesection
 {\small
@@ -105,14 +115,76 @@ The drive for the steering mechnanism needs to provide a minimal continuous torq
 
 \section{Options}
 
-kkkkkkkk
+
 \subsection{Sensodrive}
+
+\begin{itemize}
+
+\item A few SENSO-Joints and SENSO-Units were considered. Turned out they are too expensive for the project (4900 to 7100 \euro). 
+
+\item Nice to know: They work with Harmonic Drive gearheads
+
+\item Good support from Norbert Sporer (norbert.sporer@sensodrive.de) and Mathias Zehetmayr (mathias.zehetmayr@sensodrive.de)
+
+\end{itemize}
+ 
 
 \subsection{Maxon}
 
+\begin{itemize}
+
+\item Fairly cheap. Combination of motor, gearhead, encoder and motor-controller for 1000-1500 \euro.
+
+\item Major disadvantage: Average gearhead backlash of 1°
+
+\end{itemize}
+
+\subsection{Dynamixel}
+
+\begin{itemize}
+
+\item Dynamixel Pro family was considered. Accurate (low backlash) and affordable (2000-3000 \euro).
+
+\item Major Disadvantage: Too slow.
+
+\item Nice to know: Motor, gearhead and controller all in one. A lot of open source support since Dynamixel drives are a "thing" in the robot-hobbyists community. Existing Matlab support packages. 
+
+\end{itemize}
+
 \subsection{Robodrive}
 
-jjjjjjj
+\begin{itemize}
+
+\item RD50x08-HD was considered. But same as SENSO-drive. The drive is too expensive.
+
+\item They work with Harmonic Drive gearheads and therefor have supply difficulties.
+
+\item Moreover, the drive might be too slow.
+
+\end{itemize}
+
+
+
+\subsection{Harmonic Drive}
+
+\begin{itemize}
+
+\item Harmonic Drive offers drives and gearheads that fulfill all requirements. Moreover, they fit the budget. 
+
+\item Major disadvantage: Supply Difficulties
+
+\item The considered products were:
+\begin{itemize}
+
+\item FHA-14C-50-D200-EKM1 (delivery time about 40 weeks)
+\item CHA-14A-50-E-D2048 (delivery time about 18 weeks)
+\item Gearhead-Box CSF Mini-14-1U-50 (delivery time about 40 weeks)
+\item Gearhead-Box CSF-14-2UP-50 (delivery time about 40 weeks)
+
+
+\end{itemize}
+
+\end{itemize}
 
 %%fakesection
 {\small
